@@ -7,8 +7,6 @@ import (
 type User struct {
 	ID1       uint64
 	Name      string
-	FirstName string
-	LastName  string
 	Age       int64
 	Active    bool
 	Salary    float32

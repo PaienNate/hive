@@ -1,8 +1,7 @@
 package hive
 
 import (
-	"fmt"
-
+	"database/sql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/migrator"
 )
@@ -22,9 +21,8 @@ func (m Migrator) HasTable(value interface{}) bool {
 	m.handleError(m.RunWithValue(value, func(stmt *gorm.Statement) error {
 		//currentDatabase := m.DB.Migrator().CurrentDatabase()
 		return m.DB.Raw(
-			// TODO: support args
-			fmt.Sprintf("SHOW TABLES LIKE '%s'", stmt.Table),
+			"SHOW TABLES LIKE ?", stmt.Table,
 		).Row().Scan(&name)
-	}))
+	}), sql.ErrNoRows)
 	return name != ""
 }
