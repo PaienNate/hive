@@ -22,9 +22,7 @@ func TestMain(m *testing.M) {
 
 func Init() {
 	var err error
-	if DB, err = gorm.Open(Open(dbDSN), &gorm.Config{
-		//DisableAutomaticPing: true,
-	}); err != nil {
+	if DB, err = gorm.Open(Open(dbDSN), &gorm.Config{}); err != nil {
 		log.Printf("failed to connect database, got error %v", err)
 		os.Exit(1)
 	}
@@ -60,10 +58,10 @@ func RunMigrations() {
 }
 
 func TestList(t *testing.T) {
-	ret := DB.Model(&User{}).Exec("INSERT INTO `users`\n    " +
-		"(`id1`, `name`, `first_name`, `last_name`, `age`, `active`, `salary`," +
+	ret := DB.Model(&User{}).Exec("INSERT INTO `users`" +
+		"(`id1`, `name`,`age`, `active`, `salary`," +
 		" `created_at`, `updated_at`, `date`)" +
-		"VALUES (1, 'phillhuan', 'h','jw', 1,true, 100, " +
+		"VALUES (1, 'philhuan', 1,true, 100, " +
 		"'2024-05-04 12:35:30', '2024-05-04 12:35:30', '2024-05-04');")
 	//assert.Equal(t, 1, ret.RowsAffected) // TODO
 	assert.NoError(t, ret.Error)

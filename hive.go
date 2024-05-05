@@ -3,7 +3,9 @@ package hive
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
+	"runtime"
 	"strings"
 
 	"gorm.io/gorm/migrator"
@@ -48,15 +50,17 @@ var (
 
 func Open(dsn string) gorm.Dialector {
 	dsnConf, _ := ParseDSN(dsn)
+	dsn = dsnConf.Complete().FormatDSN()
 	return &Dialector{Config: &Config{DSN: dsn, DSNConfig: dsnConf}}
 }
 
 func New(config Config) gorm.Dialector {
 	switch {
 	case config.DSN == "" && config.DSNConfig != nil:
-		config.DSN = config.DSNConfig.FormatDSN()
+		config.DSN = config.DSNConfig.Complete().FormatDSN()
 	case config.DSN != "" && config.DSNConfig == nil:
 		config.DSNConfig, _ = ParseDSN(config.DSN)
+		config.DSNConfig.Complete()
 	}
 	return &Dialector{Config: &config}
 }
@@ -74,7 +78,8 @@ func (dialector *Dialector) Initialize(db *gorm.DB) (err error) {
 	if dialector.Conn != nil {
 		db.ConnPool = dialector.Conn
 	} else {
-		db.ConnPool, err = sql.Open(dialector.DriverName, dialector.DSN)
+		dsn := dialector.DSNConfig.FormatDSN()
+		db.ConnPool, err = sql.Open(dialector.DriverName, dsn)
 		if err != nil {
 			return err
 		}
@@ -260,8 +265,14 @@ func (dialector *Dialector) getLogger() logger.Interface {
 	return dialector.logger
 }
 
-func (dialector *Dialector) handleError(err error) {
+func (dialector *Dialector) handleError(err error, ignoreErrors ...error) {
 	if err != nil {
-		dialector.getLogger().Warn(context.Background(), "%v", err)
+		for _, except := range ignoreErrors {
+			if errors.Is(err, except) {
+				return
+			}
+		}
+		_, file, line, _ := runtime.Caller(1)
+		dialector.getLogger().Warn(context.Background(), "%s:%d %v", file, line, err)
 	}
 }
