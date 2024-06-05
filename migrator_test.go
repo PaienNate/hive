@@ -12,5 +12,6 @@ type User struct {
 	Salary    float32
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	Date      time.Time `gorm:"type:Date"`
+	Date      time.Time      `gorm:"type:Date"`
+	Score     map[string]int `gorm:"type:MAP<STRING,Int>;serializer:map"`
 }

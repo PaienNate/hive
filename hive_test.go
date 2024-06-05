@@ -58,11 +58,12 @@ func RunMigrations() {
 }
 
 func TestList(t *testing.T) {
-	ret := DB.Model(&User{}).Exec("INSERT INTO `users`" +
+	sql := "INSERT INTO `users`" +
 		"(`id1`, `name`,`age`, `active`, `salary`," +
-		" `created_at`, `updated_at`, `date`)" +
-		"VALUES (1, 'philhuan', 1,true, 100, " +
-		"'2024-05-04 12:35:30', '2024-05-04 12:35:30', '2024-05-04');")
+		" `created_at`, `updated_at`, `date`, `score`)" +
+		"SELECT 1, 'philhuan', 1,true, 100, " +
+		"'2024-05-04 12:35:30', '2024-05-04 12:35:30', '2024-05-04', MAP('math',120,'english', 123);"
+	ret := DB.Model(&User{}).Exec(sql)
 	//assert.Equal(t, 1, ret.RowsAffected) // TODO
 	assert.NoError(t, ret.Error)
 

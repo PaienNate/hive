@@ -17,6 +17,10 @@ func TestCreate(t *testing.T) {
 		CreatedAt: time.Time{},
 		UpdatedAt: time.Time{},
 		Date:      time.Now(),
+		Score: map[string]int{
+			"English": 100,
+			"math":    101,
+		},
 	}
 
 	if err := DB.Create(&user).Error; err != nil {
