@@ -1,4 +1,4 @@
-module gorm.io/driver/hive
+module github.com/PaienNate/hive
 
 go 1.21
 
